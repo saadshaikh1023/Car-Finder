@@ -54,7 +54,11 @@ A modern web application for browsing and filtering cars with detailed specifica
 carfinder/
 ├── app/                  # Next.js app directory
 │   ├── page.tsx          # Home page
-│   └── layout.tsx        # Root layout
+│   ├── layout.tsx        # Root layout
+│   └── cars/             # Car details pages
+│       └── [id]/         # Dynamic route for car details
+│           ├── page.tsx  # Client component for car details
+│           └── layout.tsx # Server component for static generation
 ├── components/           # React components
 │   ├── car-card.tsx      # Car card component
 │   ├── car-grid.tsx      # Grid of car cards
@@ -65,6 +69,33 @@ carfinder/
 │   └── index.ts          # Type definitions
 └── public/               # Static assets
 ```
+
+## Static Site Generation
+
+This project uses Next.js static site generation with `output: 'export'` in the Next.js configuration. This means:
+
+1. The entire site is pre-rendered at build time
+2. No server-side rendering is needed at runtime
+3. The site can be deployed to any static hosting service
+
+For dynamic routes like `/cars/[id]`, we need to specify which paths to pre-render at build time using the `generateStaticParams()` function in the layout file:
+
+```typescript
+// app/cars/[id]/layout.tsx
+import { cars } from '@/lib/cars';
+
+export function generateStaticParams() {
+  return cars.map((car) => ({
+    id: car.id,
+  }));
+}
+
+export default function CarLayout({ children }) {
+  return <>{children}</>;
+}
+```
+
+This approach separates the static generation logic (in the layout) from the client-side rendering logic (in the page component).
 
 ## Customization
 
